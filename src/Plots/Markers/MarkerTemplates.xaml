@@ -13,6 +13,13 @@
     <d3:PaletteConverter x:Key="ColorConverter"/>
     <d3:TranslateConverter x:Key="TranslateConverter"/>
 
+    <d3:TickToDateTimeConverter x:Key="TickToDateTimeConverter"/>
+    <d3:CandleGraphBrushConverter x:Key="CandleGraphBrushConverter"/>
+
+    <d3:CandleGraphUpLineLengthConverter x:Key="CandleGraphUpLineLengthConverter"/>
+    <d3:CandleGraphMiddleLineLengthConverter x:Key="CandleGraphMiddleLineLengthConverter"/>
+    <d3:CandleGraphBottomLineLengthConverter x:Key="CandleGraphBottomLineLengthConverter"/>
+
     <d3:BarGraphTopConverter x:Key="BarGraphTopConverter"/>
     <d3:BarGraphLeftConverter x:Key="BarGraphLeftConverter"/>
     <d3:BarGraphBottomConverter x:Key="BarGraphBottomConverter"/>
@@ -620,6 +627,88 @@
         </Grid>
     </DataTemplate>
 
+    <!-- Candle graph template-->
+    <DataTemplate x:Key="CandleGraph">
+        <Grid d3:Plot.X1="{Binding This, Converter={StaticResource BarGraphLeftConverter}}" 
+              d3:Plot.Y1="{Binding High, FallbackValue=0, TargetNullValue=0}"
+              d3:Plot.Y2="{Binding Low, FallbackValue=10, TargetNullValue=10}" 
+              d3:Plot.X2="{Binding This, Converter={StaticResource BarGraphRightConverter}, FallbackValue=10, TargetNullValue=10}">
+            <Grid.Resources>
+                <d3:CandleGraphDataBoundsConverter x:Key="DataBoundsFunc"/>
+            </Grid.Resources>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="1px"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="{Binding This, Converter={StaticResource CandleGraphUpLineLengthConverter}}"/>
+                <RowDefinition Height="{Binding This, Converter={StaticResource CandleGraphMiddleLineLengthConverter}}"/>
+                <RowDefinition Height="{Binding This, Converter={StaticResource CandleGraphBottomLineLengthConverter}}"/>
+            </Grid.RowDefinitions>
+            <Rectangle Grid.Row="0" Grid.Column="1" Grid.RowSpan="3" 
+                       Fill="{Binding This, Converter={StaticResource CandleGraphBrushConverter}}" 
+                       Stroke="{Binding This, Converter={StaticResource CandleGraphBrushConverter}}" 
+                       StrokeThickness="1">
+            </Rectangle>
+            <Rectangle Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
+                       Fill="{Binding This, Converter={StaticResource CandleGraphBrushConverter}}"
+                       Stroke="{Binding This, Converter={StaticResource CandleGraphBrushConverter}}" 
+                       StrokeThickness="0">
+            </Rectangle>
+        </Grid>
+    </DataTemplate>
+
+    <!-- Tooltip template showing information about bar graph -->
+    <DataTemplate x:Key="CandleGraphTooltip">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <TextBlock HorizontalAlignment="Right" 
+                       Text="{Binding Series.X.Description, StringFormat='\{0\}:', FallbackValue='X:', Converter={StaticResource NullToDefaultConverter}, ConverterParameter='X'}"/>
+            <TextBlock HorizontalAlignment="Right" Grid.Row="1" Grid.Column="0"
+                       Text="{Binding Series.Open.Description, StringFormat='\{0\}:', FallbackValue='Y:', Converter={StaticResource NullToDefaultConverter}, ConverterParameter='Open'}"/>
+            <TextBlock HorizontalAlignment="Right" Grid.Row="2" Grid.Column="0"
+                       Text="{Binding Series.Close.Description, StringFormat='\{0\}:', FallbackValue='Y:', Converter={StaticResource NullToDefaultConverter}, ConverterParameter='Close'}"/>
+            <TextBlock HorizontalAlignment="Right" Grid.Row="3" Grid.Column="0"
+                       Text="{Binding Series.High.Description, StringFormat='\{0\}:', FallbackValue='Y:', Converter={StaticResource NullToDefaultConverter}, ConverterParameter='High'}"/>
+            <TextBlock HorizontalAlignment="Right" Grid.Row="4" Grid.Column="0"
+                       Text="{Binding Series.Low.Description, StringFormat='\{0\}:', FallbackValue='Y:', Converter={StaticResource NullToDefaultConverter}, ConverterParameter='Low'}"/>
+            <TextBlock Grid.Column="1" Grid.Row="0" Margin="5,0,0,0"
+                       Text="{Binding X, Converter={StaticResource TickToDateTimeConverter}, FallbackValue='(No X data series found)'}"/>
+            <TextBlock Grid.Row="1" Margin="5,0,0,0" Grid.Column="1"
+                       Text="{Binding Path=Open, 
+                    FallbackValue='(No Open data series found)', TargetNullValue='(No Open data series found)'}"/>
+            <TextBlock Grid.Row="2" Margin="5,0,0,0" Grid.Column="1"
+                       Text="{Binding Path=Close, 
+                    FallbackValue='(No Open data series found)', TargetNullValue='(No Open data series found)'}"/>
+            <TextBlock Grid.Row="3" Margin="5,0,0,0" Grid.Column="1"
+                       Text="{Binding Path=High, 
+                    FallbackValue='(No Open data series found)', TargetNullValue='(No Open data series found)'}"/>
+            <TextBlock Grid.Row="4" Margin="5,0,0,0" Grid.Column="1"
+                       Text="{Binding Path=Low, 
+                    FallbackValue='(No Open data series found)', TargetNullValue='(No Open data series found)'}"/>
+        </Grid>
+    </DataTemplate>
+
+    <!-- Simple legend template for bar graph -->
+    <DataTemplate x:Key="CandleGraphLegend">
+        <StackPanel Orientation="Horizontal">
+            <Rectangle Fill="{Binding C.First, FallbackValue=Black, TargetNullValue=Black}"
+                       Width="5" Height="20" Stroke="Black" StrokeThickness="1"/>
+            <TextBlock Margin="5,0,0,0" VerticalAlignment="Center" Text="{Binding Open.Description, FallbackValue='(No Y data series found)'}"/>
+        </StackPanel>
+    </DataTemplate>
+    
     <!-- Bar graph template-->
     <DataTemplate x:Key="BarGraph">
         <Rectangle d3:Plot.X1="{Binding This, Converter={StaticResource BarGraphLeftConverter}}" 
